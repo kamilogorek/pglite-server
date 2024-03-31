@@ -1,0 +1,17 @@
+{
+  "name": "pglite-protocol",
+  "description": "Wire Protocol Server for PGlite",
+  "version": "0.0.0",
+  "author": "Kamil Ogórek <kamil.ogorek@gmail.com>",
+  "license": "MIT",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node main.js",
+    "watch": "node --watch main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.1.1"
+  }
+}
