@@ -1,13 +1,14 @@
 import { PGlite } from "@electric-sql/pglite";
-import { createServer } from "./server.js";
+import { createServer } from "./server.ts";
 
 const db = new PGlite();
+
 await db.exec(`
-  CREATE TABLE IF NOT EXISTS test (
-    id SERIAL PRIMARY KEY,
-    name TEXT
-  );
-  INSERT INTO test (name) VALUES ('test');
+    create table if not exists test (
+      id serial primary key,
+      name text
+    );
+    insert into test (name) values ('test');
 `);
 
 const PORT = 5432;

@@ -7,11 +7,13 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "start": "node main.js",
-    "watch": "node --watch main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "bun run main.ts",
+    "watch": "bun run --watch main.ts"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.1.1"
+    "@electric-sql/pglite": "^0.1.1",
+    "@types/bun": "^1.0.12",
+    "@types/node": "^20.12.2",
+    "typescript": "^5.4.3"
   }
 }
