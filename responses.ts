@@ -38,23 +38,21 @@ export async function createMessageResponse(
   db: PGlite
 ): Promise<Buffer> {
   switch (message.name) {
+    case "CancelRequest": {
+      return Buffer.alloc(0); // todo!()
+    }
+    case "GSSENCRequest": {
+      return Buffer.alloc(0); // todo!()
+    }
     case "SSLRequest": {
       return createSSLRequestReponse();
     }
     case "StartupMessage": {
       return createStartupMessageReponse();
     }
-    case "Query":
-    case "Parse":
-    case "Bind":
-    case "Describe":
-    case "Execute":
-    case "Sync": {
+    default: {
       const result = await db.execProtocol(message.buffer);
       return Buffer.concat(result.map(([_, buffer]) => buffer));
-    }
-    default: {
-      return Buffer.alloc(0);
     }
   }
 }

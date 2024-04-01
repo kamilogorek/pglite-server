@@ -19,7 +19,8 @@ export function createServer(db: PGlite, opts = {}) {
         const message = parseMessage(clientBuffer);
 
         console.log(`${"-".repeat(42)}\n`);
-        console.log(`> Current buffer: ${clientBuffer.length}`);
+        console.log(`> Current buffer`);
+        console.log(`> Length: ${clientBuffer.length}`);
         console.log(`> Raw:`, clientBuffer);
         console.log(`> Text: ${clientBuffer.toString()}`);
         console.log(``);
@@ -29,20 +30,23 @@ export function createServer(db: PGlite, opts = {}) {
         console.log(`>> Message buffer text: ${message.buffer.toString()}`);
         console.log(``);
 
-        if (message.name === "Unknown") {
+        if (message.name === "InsufficientData") {
           continue;
-        } else if (message.name === "Terminate") {
+        }
+
+        if (message.name === "Unknown" || message.name === "Terminate") {
           socket.end();
           return;
-        } else {
-          const response = await createMessageResponse(message, db);
-          socket.write(response);
-          clientBuffer = Buffer.from(clientBuffer.subarray(message.length));
-          console.log(`> Remaining buffer: ${clientBuffer.length}}`);
-          console.log(`> Raw:`, clientBuffer);
-          console.log(`> Text: ${clientBuffer.toString() || "<empty>"}`);
-          console.log(``);
         }
+
+        const response = await createMessageResponse(message, db);
+        socket.write(response);
+        clientBuffer = Buffer.from(clientBuffer.subarray(message.length));
+        console.log(`> Remaining buffer`);
+        console.log(`> Length: ${clientBuffer.length}`);
+        console.log(`> Raw:`, clientBuffer);
+        console.log(`> Text: ${clientBuffer.toString() || "<empty>"}`);
+        console.log(``);
       }
     });
 
