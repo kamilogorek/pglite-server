@@ -1,19 +1,30 @@
 {
-  "name": "pglite-protocol",
+  "name": "pglite-server",
   "description": "Wire Protocol Server for PGlite",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Kamil Ogórek <kamil.ogorek@gmail.com>",
   "license": "MIT",
-  "main": "main.js",
   "type": "module",
-  "scripts": {
-    "start": "bun run main.ts",
-    "watch": "bun run --watch main.ts"
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
   },
-  "dependencies": {
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "bun run test/main.ts"
+  },
+  "devDependencies": {
     "@electric-sql/pglite": "^0.1.1",
-    "@types/bun": "^1.0.12",
     "@types/node": "^20.12.2",
+    "@types/pg": "^8.11.4",
+    "pg": "^8.11.5",
+    "tsup": "^8.0.2",
     "typescript": "^5.4.3"
   }
 }

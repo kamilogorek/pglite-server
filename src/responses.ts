@@ -1,5 +1,5 @@
 import type { PGlite } from "@electric-sql/pglite";
-import type { FrontendMessage } from "./messages";
+import type { FrontendMessage } from "./messages.ts";
 
 // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SSL
 // "The server then responds with a single byte containing S or N, indicating that it is willing or unwilling to perform SSL, respectively."
