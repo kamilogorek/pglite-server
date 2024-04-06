@@ -2,6 +2,7 @@
   "name": "pglite-server",
   "description": "Wire Protocol Server for PGlite",
   "version": "0.1.0",
+  "repository": "https://github.com/kamilogorek/pglite-server",
   "author": "Kamil Ogórek <kamil.ogorek@gmail.com>",
   "license": "MIT",
   "type": "module",
@@ -20,11 +21,11 @@
     "test": "bun run test/main.ts"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.1.1",
-    "@types/node": "^20.12.2",
+    "@electric-sql/pglite": "^0.1.2",
+    "@types/node": "^20.12.4",
     "@types/pg": "^8.11.4",
     "pg": "^8.11.5",
     "tsup": "^8.0.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.4"
   }
 }
