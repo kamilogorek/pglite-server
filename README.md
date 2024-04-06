@@ -121,3 +121,12 @@ brew install wireshark
 ```sh
 tshark -i lo -f 'tcp port 5432' -d tcp.port==5432,pgsql -T fields -e pgsql.length -e pgsql.type -e pgsql.query
 ```
+
+## Publishing
+
+```
+npm version <patch|minor|major>
+git push
+bun run build
+npm publish
+```
