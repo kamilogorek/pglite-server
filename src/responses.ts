@@ -1,62 +1,70 @@
 import type { PGlite } from "@electric-sql/pglite";
 import type { FrontendMessage } from "./messages.ts";
+import { GrowableOffsetBuffer } from "./write-buffer.ts";
+
+function createCancelRequest(): Buffer {
+  return new GrowableOffsetBuffer().toBuffer(); // todo!()
+}
+
+function createGSSENCRequest(): Buffer {
+  return new GrowableOffsetBuffer().toBuffer(); // todo!()
+}
 
 // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SSL
 // "The server then responds with a single byte containing S or N, indicating that it is willing or unwilling to perform SSL, respectively."
 function createSSLRequestReponse(): Buffer {
   // SSL negotiation
-  const sslNegotiation = Buffer.alloc(1);
+  const sslNegotiation = new GrowableOffsetBuffer();
   sslNegotiation.write("N");
-  return sslNegotiation;
+  return sslNegotiation.toBuffer();
 }
 
 function createStartupMessageReponse(): Buffer {
   // AuthenticationOk
-  const authOk = Buffer.alloc(9);
+  const authOk = new GrowableOffsetBuffer();
   authOk.write("R");
-  authOk.writeUint32BE(8, 1);
-  authOk.writeUint32BE(0, 5);
+  authOk.writeUint32BE(8);
+  authOk.writeUint32BE(0);
 
   // BackendKeyData
-  const backendKeyData = Buffer.alloc(13);
+  const backendKeyData = new GrowableOffsetBuffer();
   backendKeyData.write("K");
-  backendKeyData.writeUint32BE(12, 1);
-  backendKeyData.writeUint32BE(1, 5);
-  backendKeyData.writeUint32BE(2, 9);
+  backendKeyData.writeUint32BE(12);
+  backendKeyData.writeUint32BE(1);
+  backendKeyData.writeUint32BE(2);
 
   // ReadyForQuery
-  const readyForQuery = Buffer.alloc(6);
+  const readyForQuery = new GrowableOffsetBuffer();
   readyForQuery.write("Z");
-  readyForQuery.writeUint32BE(5, 1);
-  readyForQuery.write("I", 5);
+  readyForQuery.writeUint32BE(5);
+  readyForQuery.write("I");
 
-  return Buffer.concat([authOk, backendKeyData, readyForQuery]);
+  return Buffer.concat([
+    authOk.toBuffer(),
+    backendKeyData.toBuffer(),
+    readyForQuery.toBuffer(),
+  ]);
 }
 
 // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SIMPLE-QUERY
 // "In the event of an error, ErrorResponse is issued followed by ReadyForQuery."
 function createErrorReponse(message: string): Buffer {
   // ErrorResponse
-  const errorResponse = Buffer.alloc(8 + message.length);
+  const errorResponse = new GrowableOffsetBuffer();
   errorResponse.write("E");
-  //   4 bytes for length header itself
-  // + 1 byte for M field
-  // + N byte for M value itself
-  // + 1 byte for M field null-terminator
-  // + 1 byte for message body null-terminator
-  errorResponse.writeUint32BE(7 + message.length, 1);
-  errorResponse.write("M", 5);
-  errorResponse.write(message, 6);
-  errorResponse.writeUint8(0, 6 + message.length);
-  errorResponse.writeUint8(0, 7 + message.length);
+  errorResponse.writeUint32BE(7 + message.length);
+  errorResponse.write("M");
+  errorResponse.write(message);
+  errorResponse.writeUint8(0);
+  errorResponse.writeUint8(0);
 
   // ReadyForQuery
-  const readyForQuery = Buffer.alloc(6);
+  const readyForQuery = new GrowableOffsetBuffer();
   readyForQuery.write("Z");
-  readyForQuery.writeUint32BE(5, 1);
-  readyForQuery.write("I", 5);
+  readyForQuery.writeUint32BE(5);
+  readyForQuery.write("I");
 
-  return Buffer.concat([errorResponse, readyForQuery]);
+  return Buffer.concat([errorResponse.toBuffer(), readyForQuery.toBuffer()]);
 }
 
 export async function createMessageResponse(
@@ -65,10 +73,10 @@ export async function createMessageResponse(
 ): Promise<Buffer> {
   switch (message.name) {
     case "CancelRequest": {
-      return Buffer.alloc(0); // todo!()
+      return createCancelRequest();
     }
     case "GSSENCRequest": {
-      return Buffer.alloc(0); // todo!()
+      return createGSSENCRequest();
     }
     case "SSLRequest": {
       return createSSLRequestReponse();
