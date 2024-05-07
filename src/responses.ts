@@ -33,6 +33,32 @@ function createStartupMessageReponse(): Buffer {
   return Buffer.concat([authOk, backendKeyData, readyForQuery]);
 }
 
+// https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SIMPLE-QUERY
+// "In the event of an error, ErrorResponse is issued followed by ReadyForQuery."
+function createErrorReponse(message: string): Buffer {
+  // ErrorResponse
+  const errorResponse = Buffer.alloc(8 + message.length);
+  errorResponse.write("E");
+  //   4 bytes for length header itself
+  // + 1 byte for M field
+  // + N byte for M value itself
+  // + 1 byte for M field null-terminator
+  // + 1 byte for message body null-terminator
+  errorResponse.writeUint32BE(7 + message.length, 1);
+  errorResponse.write("M", 5);
+  errorResponse.write(message, 6);
+  errorResponse.writeUint8(0, 6 + message.length);
+  errorResponse.writeUint8(0, 7 + message.length);
+
+  // ReadyForQuery
+  const readyForQuery = Buffer.alloc(6);
+  readyForQuery.write("Z");
+  readyForQuery.writeUint32BE(5, 1);
+  readyForQuery.write("I", 5);
+
+  return Buffer.concat([errorResponse, readyForQuery]);
+}
+
 export async function createMessageResponse(
   message: FrontendMessage,
   db: PGlite
@@ -51,8 +77,14 @@ export async function createMessageResponse(
       return createStartupMessageReponse();
     }
     default: {
-      const result = await db.execProtocol(message.buffer);
-      return Buffer.concat(result.map(([_, buffer]) => buffer));
+      try {
+        const result = await db.execProtocol(message.buffer);
+        return Buffer.concat(result.map(([_, buffer]) => buffer));
+      } catch (e: unknown) {
+        const message =
+          e instanceof Error ? e.message : "Unknown error message";
+        return createErrorReponse(message);
+      }
     }
   }
 }

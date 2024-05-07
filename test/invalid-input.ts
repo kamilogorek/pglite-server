@@ -29,26 +29,21 @@ pgServer.listen(async () => {
 
   let exitCode = 0;
   try {
-    const res = await client.query("select * from test");
-    assert.deepStrictEqual(res.rows, [
-      {
-        id: 1,
-        name: "foo",
-      },
-      {
-        id: 2,
-        name: "bar",
-      },
-      {
-        id: 3,
-        name: "baz",
-      },
-    ]);
-    console.log(green("Assertions passed!"));
-  } catch (err) {
-    console.error(err);
+    await client.query("invalid command;");
     console.log(red("Assertions failed!"));
     exitCode = 1;
+  } catch (err: unknown) {
+    try {
+      assert.strictEqual(
+        (err as Error).message,
+        'syntax error at or near "invalid"'
+      );
+      console.log(green("Assertions passed!"));
+    } catch (err: unknown) {
+      console.error(err);
+      console.log(red("Assertions failed!"));
+      exitCode = 1;
+    }
   } finally {
     await client.end();
     await new Promise((resolve) => setTimeout(resolve)); // Wait for next tick to let client disconnect

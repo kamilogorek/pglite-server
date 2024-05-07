@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
-    "test": "bun run test/main.ts"
+    "test": "bun run test/main.ts && bun run test/invalid-input.ts"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.1.2",
