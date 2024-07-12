@@ -26,6 +26,20 @@ function createStartupMessageReponse(): Buffer {
   authOk.writeUint32BE(8);
   authOk.writeUint32BE(0);
 
+  // ParameterStatus
+  const parameterStatus = new GrowableOffsetBuffer();
+  const paramKey = "server_version";
+  // Some tools (eg. DBeaver and Datagrip) require `server_version` param to be announced during startup.
+  // The value itself is not important, only the existence of it, as call to `SHOW server_version;`
+  // which is used to display version in the UI,  will be redirected to the underlying `execProtocol` anyway.
+  const paramValue = "pglite";
+  parameterStatus.write("S");
+  parameterStatus.writeUint32BE(6 + paramKey.length + paramValue.length);
+  parameterStatus.write(paramKey);
+  parameterStatus.writeUint8(0);
+  parameterStatus.write(paramValue);
+  parameterStatus.writeUint8(0);
+
   // BackendKeyData
   const backendKeyData = new GrowableOffsetBuffer();
   backendKeyData.write("K");
@@ -41,6 +55,7 @@ function createStartupMessageReponse(): Buffer {
 
   return Buffer.concat([
     authOk.toBuffer(),
+    parameterStatus.toBuffer(),
     backendKeyData.toBuffer(),
     readyForQuery.toBuffer(),
   ]);
