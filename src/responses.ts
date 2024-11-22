@@ -102,7 +102,7 @@ export async function createMessageResponse(
     default: {
       try {
         const result = await db.execProtocol(message.buffer);
-        return Buffer.concat(result.map(([_, buffer]) => buffer));
+        return Buffer.from(result.data);
       } catch (e: unknown) {
         const message =
           e instanceof Error ? e.message : "Unknown error message";

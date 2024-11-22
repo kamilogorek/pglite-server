@@ -21,10 +21,10 @@
     "test": "bun run test/main.ts && bun run test/invalid-input.ts"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.1.2",
+    "@electric-sql/pglite": "0.2.13",
     "@types/node": "^20.12.4",
-    "@types/pg": "^8.11.4",
-    "pg": "^8.11.5",
+    "@types/pg": "^8.11.10",
+    "pg": "^8.13.1",
     "tsup": "^8.0.2",
     "typescript": "^5.4.4"
   }
