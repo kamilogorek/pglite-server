@@ -1,8 +1,8 @@
+import assert from "node:assert";
+import type { AddressInfo } from "node:net";
 import { PGlite } from "@electric-sql/pglite";
 import { Client } from "pg";
 import { createServer } from "../src/server.ts";
-import assert from "assert";
-import type { AddressInfo } from "net";
 import { green, red } from "./colors.ts";
 
 const db = new PGlite();

@@ -1,5 +1,5 @@
-import type { PGlite } from "@electric-sql/pglite";
 import * as net from "node:net";
+import type { PGlite } from "@electric-sql/pglite";
 import { parseMessage } from "./messages.ts";
 import { createMessageResponse } from "./responses.ts";
 import { Logger, LogLevel } from "./logger.ts";
