@@ -2,7 +2,10 @@
   "name": "pglite-server",
   "description": "Wire Protocol Server for PGlite",
   "version": "0.1.4",
-  "repository": "https://github.com/kamilogorek/pglite-server",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kamilogorek/pglite-server.git"
+  },
   "author": "Kamil Ogórek <kamil.ogorek@gmail.com>",
   "license": "MIT",
   "type": "module",
