@@ -1,8 +1,7 @@
 # Wire Protocol Server for PGlite
 
-> [!IMPORTANT]
-> The `pglite-server` is currently only working with `0.1.x` releases of `@electric-sql/pglite`.<br>
-> If you are looking for more versatile and actively developed solution, use [`pg-gateway`](https://github.com/supabase-community/pg-gateway) from [Supabase](https://supabase.com/) instead.
+> [!TIP]
+> If you are looking for more versatile and feature-rich solution, check [`pg-gateway`](https://github.com/supabase-community/pg-gateway) from [Supabase](https://supabase.com/) instead.
 
 A spare-time attempt to understand Postgres Wire Protocol and expose a TCP server,
 that can be used to redirect all client requests to [PGlite](https://github.com/electric-sql/pglite) instance.
