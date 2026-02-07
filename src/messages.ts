@@ -58,7 +58,7 @@ const UNKNOWN_MESSAGE: FrontendMessage = {
 };
 
 const INSUFFICIENT_DATA: FrontendMessage = {
-  name: "Unknown",
+  name: "InsufficientData",
   length: 0,
   buffer: Buffer.alloc(0),
 };
