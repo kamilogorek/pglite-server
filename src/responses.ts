@@ -34,7 +34,7 @@ function createStartupMessageReponse(): Buffer {
   // which is used to display version in the UI,  will be redirected to the underlying `execProtocol` anyway.
   const paramValue = "pglite";
   parameterStatus.write("S");
-  parameterStatus.writeUint32BE(6 + paramKey.length + paramValue.length);
+  parameterStatus.writeUint32BE(6 + Buffer.byteLength(paramKey) + Buffer.byteLength(paramValue));
   parameterStatus.write(paramKey);
   parameterStatus.writeUint8(0);
   parameterStatus.write(paramValue);
