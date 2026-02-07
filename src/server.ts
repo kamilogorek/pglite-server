@@ -88,9 +88,5 @@ export function createServer(
     });
   });
 
-  server.on("error", (err) => {
-    throw err;
-  });
-
   return server;
 }
