@@ -70,12 +70,12 @@ export function createServer(
       processBuffer(clientBuffer, socket, db, logger)
         .then((remaining) => {
           clientBuffer = remaining;
+          socket.resume();
         })
         .catch((err) => {
           logger.error("Unhandled error processing buffer:", err);
           socket.end();
-        })
-        .finally(() => socket.resume());
+        });
     });
 
     socket.on("end", () => {
