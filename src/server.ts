@@ -21,7 +21,7 @@ export function createServer(
 
     logger.info(`Client connected`);
 
-    socket.on("data", async (data) => {
+    socket.on("data", async (data: Buffer) => {
       clientBuffer = Buffer.concat([clientBuffer, data]);
 
       while (clientBuffer.length > 0) {
