@@ -12,11 +12,9 @@ type MessageWithIdentifier =
   | "Execute"
   | "Flush"
   | "FunctionCall"
-  | "GSSResponse"
   | "Parse"
-  | "PasswordMessage"
+  | "PasswordMessage" // 0x70 - shared with GSSResponse and SASLResponse
   | "Query"
-  | "SASLResponse" // same as "SASLInitialResponse"
   | "Sync"
   | "Terminate";
 
@@ -42,11 +40,13 @@ const IDENT_TO_MESSAGE_NAME: Record<number, MessageWithIdentifier> = {
   ["E".charCodeAt(0)]: "Execute",
   ["H".charCodeAt(0)]: "Flush",
   ["F".charCodeAt(0)]: "FunctionCall",
-  ["p".charCodeAt(0)]: "GSSResponse",
   ["P".charCodeAt(0)]: "Parse",
   ["p".charCodeAt(0)]: "PasswordMessage",
+  // GSSResponse and SASLResponse share the same 0x70 identifier as PasswordMessage.
+  // They cannot be distinguished by identifier alone and require connection state context.
+  // ["p".charCodeAt(0)]: "GSSResponse",
+  // ["p".charCodeAt(0)]: "SASLResponse",
   ["Q".charCodeAt(0)]: "Query",
-  ["p".charCodeAt(0)]: "SASLResponse",
   ["S".charCodeAt(0)]: "Sync",
   ["X".charCodeAt(0)]: "Terminate",
 };
