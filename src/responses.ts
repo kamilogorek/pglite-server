@@ -2,12 +2,12 @@ import type { PGlite } from "@electric-sql/pglite";
 import type { FrontendMessage } from "./messages.ts";
 import { GrowableOffsetBuffer } from "./write-buffer.ts";
 
-function createCancelRequest(): Buffer {
-  return new GrowableOffsetBuffer().toBuffer(); // todo!()
-}
-
-function createGSSENCRequest(): Buffer {
-  return new GrowableOffsetBuffer().toBuffer(); // todo!()
+// https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-GSSAPI-ENCRYPTION
+// "The server then responds with a single byte containing G or N, indicating that it is willing or unwilling to perform GSSAPI encryption, respectively."
+function createGSSENCRequestResponse(): Buffer {
+  const gssEncNegotiation = new GrowableOffsetBuffer();
+  gssEncNegotiation.write("N");
+  return gssEncNegotiation.toBuffer();
 }
 
 // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SSL
@@ -85,13 +85,16 @@ function createErrorResponse(message: string): Buffer {
 export async function createMessageResponse(
   message: FrontendMessage,
   db: PGlite
-): Promise<Buffer> {
+): Promise<Buffer | null> {
   switch (message.name) {
+    // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-CANCELING-REQUESTS
+    // CancelRequest is sent on a separate connection and expects no response.
+    // The server should simply close the connection after receiving it.
     case "CancelRequest": {
-      return createCancelRequest();
+      return null;
     }
     case "GSSENCRequest": {
-      return createGSSENCRequest();
+      return createGSSENCRequestResponse();
     }
     case "SSLRequest": {
       return createSSLRequestResponse();

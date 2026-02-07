@@ -39,6 +39,10 @@ async function processBuffer(
     }
 
     const response = await createMessageResponse(message, db);
+    if (response === null) {
+      socket.end();
+      return clientBuffer;
+    }
     socket.write(response);
     clientBuffer = Buffer.from(clientBuffer.subarray(message.length));
     logger.debug(`> Remaining buffer`);
