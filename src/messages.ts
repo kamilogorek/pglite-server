@@ -106,46 +106,37 @@ function isStartupMessage(buffer: Buffer): boolean {
 // https://www.postgresql.org/docs/current/protocol.html
 // https://www.postgresql.org/docs/current/protocol-message-formats.html
 export function parseMessage(buffer: Buffer): FrontendMessage {
-  if (buffer.length === 0) {
+  if (buffer.length < 5) {
     return INSUFFICIENT_DATA;
   }
 
-  if (isCancelRequest(buffer)) {
-    const length = buffer.readUint32BE(0);
-    return {
-      name: "CancelRequest",
-      length,
-      buffer: Buffer.from(buffer.subarray(0, length)),
-    };
+  // Messages without identifier need at least 8 bytes (4 length + 4 magic)
+  if (buffer.length >= 8) {
+    let unidentifiedName: MessageWithoutIdentifier | null = null;
+    if (isCancelRequest(buffer)) {
+      unidentifiedName = "CancelRequest";
+    } else if (isGSSENCRequest(buffer)) {
+      unidentifiedName = "GSSENCRequest";
+    } else if (isSSLRequest(buffer)) {
+      unidentifiedName = "SSLRequest";
+    } else if (isStartupMessage(buffer)) {
+      unidentifiedName = "StartupMessage";
+    }
+
+    if (unidentifiedName) {
+      const length = buffer.readUint32BE(0);
+      if (buffer.length < length) {
+        return INSUFFICIENT_DATA;
+      }
+      return {
+        name: unidentifiedName,
+        length,
+        buffer: Buffer.from(buffer.subarray(0, length)),
+      };
+    }
   }
 
-  if (isGSSENCRequest(buffer)) {
-    const length = buffer.readUint32BE(0);
-    return {
-      name: "GSSENCRequest",
-      length,
-      buffer: Buffer.from(buffer.subarray(0, length)),
-    };
-  }
-
-  if (isSSLRequest(buffer)) {
-    const length = buffer.readUint32BE(0);
-    return {
-      name: "SSLRequest",
-      length,
-      buffer: Buffer.from(buffer.subarray(0, length)),
-    };
-  }
-
-  if (isStartupMessage(buffer)) {
-    const length = buffer.readUint32BE(0);
-    return {
-      name: "StartupMessage",
-      length,
-      buffer: Buffer.from(buffer.subarray(0, length)),
-    };
-  }
-
+  // Messages with identifier need at least 5 bytes (1 identifier + 4 length)
   const name = IDENT_TO_MESSAGE_NAME[buffer.at(0)!];
   if (!name) {
     return UNKNOWN_MESSAGE;
