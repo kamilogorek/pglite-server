@@ -3,9 +3,10 @@ export class GrowableOffsetBuffer {
   #offset = 0;
 
   write(data: string) {
-    this.updateCapacity(data.length);
+    const byteLength = Buffer.byteLength(data);
+    this.updateCapacity(byteLength);
     this.#buffer.write(data, this.#offset);
-    this.#offset += data.length;
+    this.#offset += byteLength;
   }
 
   writeUint8(data: number) {

@@ -67,7 +67,7 @@ function createErrorReponse(message: string): Buffer {
   // ErrorResponse
   const errorResponse = new GrowableOffsetBuffer();
   errorResponse.write("E");
-  errorResponse.writeUint32BE(7 + message.length);
+  errorResponse.writeUint32BE(7 + Buffer.byteLength(message));
   errorResponse.write("M");
   errorResponse.write(message);
   errorResponse.writeUint8(0);
