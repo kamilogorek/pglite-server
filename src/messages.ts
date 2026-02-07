@@ -139,6 +139,11 @@ export function parseMessage(buffer: Buffer): FrontendMessage {
   // Messages with identifier need at least 5 bytes (1 identifier + 4 length)
   const name = IDENT_TO_MESSAGE_NAME[buffer.at(0)!];
   if (!name) {
+    // If we don't have enough bytes to check unidentified messages,
+    // this could still be a partial SSLRequest/StartupMessage/etc.
+    if (buffer.length < 8) {
+      return INSUFFICIENT_DATA;
+    }
     return UNKNOWN_MESSAGE;
   }
 
