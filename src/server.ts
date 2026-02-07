@@ -54,12 +54,13 @@ export function createServer(
   db: PGlite,
   options: Partial<ServerOptions> = { logLevel: LogLevel.Info },
 ) {
-  const server = net.createServer(options);
+  const { logLevel, ...serverOptions } = options;
+  const server = net.createServer(serverOptions);
 
   server.on("connection", function (socket) {
     let clientBuffer: Buffer = Buffer.allocUnsafe(0);
     const clientAddr = `${socket.remoteAddress}:${socket.remotePort}`;
-    const logger = new Logger(options.logLevel, clientAddr);
+    const logger = new Logger(logLevel, clientAddr);
 
     logger.info(`Client connected`);
 
