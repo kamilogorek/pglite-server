@@ -4,22 +4,16 @@ import { GrowableOffsetBuffer } from "./write-buffer.ts";
 
 // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-GSSAPI-ENCRYPTION
 // "The server then responds with a single byte containing G or N, indicating that it is willing or unwilling to perform GSSAPI encryption, respectively."
-function createGSSENCRequestResponse(): Buffer {
-  const gssEncNegotiation = new GrowableOffsetBuffer();
-  gssEncNegotiation.write("N");
-  return gssEncNegotiation.toBuffer();
-}
+const GSSENC_REQUEST_RESPONSE = Buffer.from("N");
 
 // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SSL
 // "The server then responds with a single byte containing S or N, indicating that it is willing or unwilling to perform SSL, respectively."
-function createSSLRequestResponse(): Buffer {
-  // SSL negotiation
-  const sslNegotiation = new GrowableOffsetBuffer();
-  sslNegotiation.write("N");
-  return sslNegotiation.toBuffer();
-}
+const SSL_REQUEST_RESPONSE = Buffer.from("N");
 
-function createStartupMessageResponse(): Buffer {
+// Pre-computed startup response: AuthenticationOk + ParameterStatus + BackendKeyData + ReadyForQuery
+const STARTUP_MESSAGE_RESPONSE = buildStartupMessageResponse();
+
+function buildStartupMessageResponse(): Buffer {
   // AuthenticationOk
   const authOk = new GrowableOffsetBuffer();
   authOk.write("R");
@@ -27,11 +21,11 @@ function createStartupMessageResponse(): Buffer {
   authOk.writeUint32BE(0);
 
   // ParameterStatus
-  const parameterStatus = new GrowableOffsetBuffer();
-  const paramKey = "server_version";
   // Some tools (eg. DBeaver and Datagrip) require `server_version` param to be announced during startup.
   // The value itself is not important, only the existence of it, as call to `SHOW server_version;`
-  // which is used to display version in the UI,  will be redirected to the underlying `execProtocol` anyway.
+  // which is used to display version in the UI, will be redirected to the underlying `execProtocol` anyway.
+  const parameterStatus = new GrowableOffsetBuffer();
+  const paramKey = "server_version";
   const paramValue = "pglite";
   parameterStatus.write("S");
   parameterStatus.writeUint32BE(6 + Buffer.byteLength(paramKey) + Buffer.byteLength(paramValue));
@@ -94,13 +88,13 @@ export async function createMessageResponse(
       return null;
     }
     case "GSSENCRequest": {
-      return createGSSENCRequestResponse();
+      return GSSENC_REQUEST_RESPONSE;
     }
     case "SSLRequest": {
-      return createSSLRequestResponse();
+      return SSL_REQUEST_RESPONSE;
     }
     case "StartupMessage": {
-      return createStartupMessageResponse();
+      return STARTUP_MESSAGE_RESPONSE;
     }
     default: {
       try {
