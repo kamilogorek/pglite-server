@@ -21,9 +21,13 @@ export function createServer(
 
     logger.info(`Client connected`);
 
-    socket.on("data", async (data: Buffer) => {
+    socket.on("data", (data: Buffer) => {
       clientBuffer = Buffer.concat([clientBuffer, data]);
+      socket.pause();
+      processBuffer().then(() => socket.resume());
+    });
 
+    async function processBuffer() {
       while (clientBuffer.length > 0) {
         const message = parseMessage(clientBuffer);
 
@@ -57,7 +61,7 @@ export function createServer(
         logger.debug(`> Text: ${clientBuffer.toString() || "<empty>"}`);
         logger.debug(``);
       }
-    });
+    }
 
     socket.on("end", () => {
       logger.info(`Client disconnected`);
