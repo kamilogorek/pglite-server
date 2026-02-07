@@ -40,7 +40,7 @@ export function createServer(
         logger.debug(``);
 
         if (message.name === "InsufficientData") {
-          continue;
+          break;
         }
 
         if (message.name === "Unknown" || message.name === "Terminate") {
