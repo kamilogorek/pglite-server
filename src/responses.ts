@@ -12,14 +12,14 @@ function createGSSENCRequest(): Buffer {
 
 // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SSL
 // "The server then responds with a single byte containing S or N, indicating that it is willing or unwilling to perform SSL, respectively."
-function createSSLRequestReponse(): Buffer {
+function createSSLRequestResponse(): Buffer {
   // SSL negotiation
   const sslNegotiation = new GrowableOffsetBuffer();
   sslNegotiation.write("N");
   return sslNegotiation.toBuffer();
 }
 
-function createStartupMessageReponse(): Buffer {
+function createStartupMessageResponse(): Buffer {
   // AuthenticationOk
   const authOk = new GrowableOffsetBuffer();
   authOk.write("R");
@@ -63,7 +63,7 @@ function createStartupMessageReponse(): Buffer {
 
 // https://www.postgresql.org/docs/current/protocol-flow.html#PROTOCOL-FLOW-SIMPLE-QUERY
 // "In the event of an error, ErrorResponse is issued followed by ReadyForQuery."
-function createErrorReponse(message: string): Buffer {
+function createErrorResponse(message: string): Buffer {
   // ErrorResponse
   const errorResponse = new GrowableOffsetBuffer();
   errorResponse.write("E");
@@ -94,10 +94,10 @@ export async function createMessageResponse(
       return createGSSENCRequest();
     }
     case "SSLRequest": {
-      return createSSLRequestReponse();
+      return createSSLRequestResponse();
     }
     case "StartupMessage": {
-      return createStartupMessageReponse();
+      return createStartupMessageResponse();
     }
     default: {
       try {
@@ -106,7 +106,7 @@ export async function createMessageResponse(
       } catch (e: unknown) {
         const message =
           e instanceof Error ? e.message : "Unknown error message";
-        return createErrorReponse(message);
+        return createErrorResponse(message);
       }
     }
   }
