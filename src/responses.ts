@@ -104,9 +104,9 @@ export async function createMessageResponse(
         const result = await db.execProtocol(message.buffer);
         return Buffer.from(result.data);
       } catch (e: unknown) {
-        const message =
+        const errorMessage =
           e instanceof Error ? e.message : "Unknown error message";
-        return createErrorResponse(message);
+        return createErrorResponse(errorMessage);
       }
     }
   }
